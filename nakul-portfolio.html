@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nakul — Portfolio</title>
+<style>
+/* ── Reset & Base ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#050508;color:#fff;font-family:'Segoe UI',system-ui,sans-serif;overflow-x:hidden}
+
+/* ── Fonts via system stack + CSS vars ── */
+:root{
+  --purple:#a78bfa;--blue:#60a5fa;--green:#34d399;--amber:#f59e0b;--pink:#ec4899;--teal:#14b8a6;
+  --bg:#050508;--card:#0d0d14;--border:rgba(255,255,255,0.07);
+}
+
+/* ── Gradient text ── */
+.gt{background:linear-gradient(135deg,#a78bfa 0%,#60a5fa 50%,#34d399 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.gt-warm{background:linear-gradient(135deg,#f59e0b,#ef4444,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* ── Noise overlay ── */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.4}
+
+/* ── Scroll progress bar ── */
+#progress-bar{position:fixed;top:0;left:0;height:2px;width:0%;background:linear-gradient(90deg,#a78bfa,#60a5fa,#34d399);z-index:10000;transition:width .1s linear}
+
+/* ── Navbar ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 40px;display:flex;justify-content:space-between;align-items:center;transition:all .4s ease}
+nav.scrolled{background:rgba(5,5,8,.88);backdrop-filter:blur(20px);border-bottom:1px solid rgba(167,139,250,.1)}
+.nav-logo{font-weight:800;font-size:1.2rem;letter-spacing:.05em}
+.nav-links{display:flex;gap:2rem;align-items:center}
+.nav-links a{color:rgba(255,255,255,.55);text-decoration:none;font-size:.82rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;transition:color .2s}
+.nav-links a:hover{color:#a78bfa}
+
+/* ── Resume button ── */
+.resume-btn{position:relative;overflow:hidden;padding:10px 24px;border-radius:100px;border:1.5px solid rgba(167,139,250,.5);background:rgba(167,139,250,.08);color:#c4b5fd;font-weight:600;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .3s ease;text-decoration:none}
+.resume-btn:hover{border-color:rgba(167,139,250,.8);background:rgba(167,139,250,.18);transform:translateY(-2px);box-shadow:0 8px 30px rgba(167,139,250,.2)}
+.resume-btn::after{content:'';position:absolute;top:0;left:-80%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);transform:skewX(-20deg);animation:shine 3s ease-in-out infinite}
+@keyframes shine{0%{left:-80%}60%,100%{left:130%}}
+
+/* ── Sections ── */
+section{padding:100px 40px}
+.container{max-width:1100px;margin:0 auto}
+.container-wide{max-width:1200px;margin:0 auto}
+
+/* ── Fade-in on scroll ── */
+.fade-in{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+.fade-in-left{opacity:0;transform:translateX(-40px);transition:opacity .7s ease,transform .7s ease}
+.fade-in-left.visible{opacity:1;transform:translateX(0)}
+.fade-in-right{opacity:0;transform:translateX(40px);transition:opacity .7s ease,transform .7s ease}
+.fade-in-right.visible{opacity:1;transform:translateX(0)}
+
+/* ── HERO ── */
+#hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden;padding:0 40px}
+.orbit{position:absolute;border-radius:50%;border:1px solid rgba(167,139,250,.12);animation:orbit-spin linear infinite}
+@keyframes orbit-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.glow-blob{position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none}
+.shape{position:absolute;animation:float-shape ease-in-out infinite}
+@keyframes float-shape{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-18px) rotate(5deg)}}
+.hero-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:20px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(167,139,250,.3);border-radius:100px;padding:6px 18px;color:rgba(255,255,255,.7);font-size:.8rem;letter-spacing:.12em;animation:fadeUp .6s ease .2s both}
+.hero-dot{width:6px;height:6px;border-radius:50%;background:#34d399;box-shadow:0 0 8px #34d399;flex-shrink:0}
+h1.hero-name{font-size:clamp(4.5rem,17vw,14rem);font-weight:800;letter-spacing:-.03em;line-height:.9;animation:fadeUp .8s ease .3s both;cursor:default}
+h1.hero-name span{display:inline-block;transition:transform .2s ease}
+h1.hero-name span:hover{transform:translateY(-6px) scale(1.1)}
+.hero-sub{font-size:clamp(.95rem,1.8vw,1.3rem);color:rgba(255,255,255,.5);font-weight:300;letter-spacing:.04em;max-width:520px;line-height:1.6;animation:fadeUp .7s ease .55s both}
+.hero-buttons{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;animation:fadeUp .7s ease .7s both}
+.btn-primary{padding:14px 36px;border-radius:100px;background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;text-decoration:none;font-weight:600;font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;box-shadow:0 0 30px rgba(124,58,237,.4);transition:all .3s ease;border:none;cursor:pointer}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 8px 40px rgba(124,58,237,.6)}
+.btn-ghost{padding:14px 36px;border-radius:100px;border:1.5px solid rgba(167,139,250,.4);color:rgba(255,255,255,.8);text-decoration:none;font-weight:500;font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;transition:all .3s ease;background:transparent}
+.btn-ghost:hover{border-color:#a78bfa;color:#a78bfa}
+.scroll-hint{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:40px;animation:fadeUp .6s ease 1.2s both}
+.scroll-hint span{color:rgba(255,255,255,.3);font-size:.7rem;letter-spacing:.2em}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,rgba(167,139,250,.6),transparent);animation:pulse-line 1.5s ease-in-out infinite}
+@keyframes pulse-line{0%,100%{opacity:.5;transform:scaleY(1)}50%{opacity:1;transform:scaleY(1.1)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── ABOUT ── */
+#about-section{padding:100px 40px}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.about-text .label{color:#a78bfa;font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;margin-bottom:12px;display:block}
+.about-text h2{font-size:clamp(2rem,4.5vw,3.5rem);font-weight:800;line-height:1.1;margin-bottom:20px}
+.about-text p{color:rgba(255,255,255,.55);line-height:1.8;font-size:.98rem;font-weight:300;margin-bottom:14px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.stat-card{padding:28px 22px;border-radius:20px;border:1px solid rgba(167,139,250,.15);background:rgba(167,139,250,.04);backdrop-filter:blur(10px);transition:transform .2s ease,box-shadow .2s ease}
+.stat-card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(167,139,250,.1)}
+.stat-num{font-size:2.2rem;font-weight:800;margin-bottom:6px}
+.stat-lbl{color:rgba(255,255,255,.4);font-size:.78rem;letter-spacing:.08em}
+
+/* ── SKILLS ── */
+#skills{background:transparent}
+.section-label{color:#60a5fa;font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;margin-bottom:12px;display:block}
+.section-title{font-size:clamp(2.2rem,5.5vw,4.5rem);font-weight:800;margin-bottom:56px}
+.skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.skill-box{padding:30px;border-radius:22px;transition:transform .2s ease}
+.skill-box:hover{transform:translateY(-4px)}
+.skill-box-label{font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:18px;display:block}
+.pills{display:flex;flex-wrap:wrap;gap:10px}
+.pill{padding:7px 15px;border-radius:100px;border:1px solid rgba(167,139,250,.2);background:rgba(167,139,250,.05);color:rgba(255,255,255,.8);font-size:.8rem;cursor:default;transition:all .25s ease}
+.pill:hover{border-color:rgba(167,139,250,.6);background:rgba(167,139,250,.14);transform:translateY(-2px)}
+
+/* ── PROJECTS ── */
+#projects{}
+.projects-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+
+/* Project card */
+.proj-card{border-radius:26px;overflow:hidden;background:var(--card);border:1px solid var(--border);transition:border-color .35s ease,box-shadow .35s ease,transform .3s ease;cursor:pointer;display:flex;flex-direction:column}
+.proj-card:hover{border-color:rgba(167,139,250,.35);box-shadow:0 0 60px rgba(167,139,250,.1);transform:translateY(-8px)}
+.proj-img-wrap{position:relative;overflow:hidden;height:210px;flex-shrink:0}
+.proj-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s cubic-bezier(.25,.46,.45,.94),filter .4s ease;filter:saturate(.85) brightness(.88)}
+.proj-card:hover .proj-img{transform:scale(1.07);filter:saturate(1) brightness(1)}
+.proj-img-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(5,5,8,.97) 100%);pointer-events:none}
+.proj-badge{position:absolute;top:14px;font-size:.68rem;letter-spacing:.12em;font-weight:500;background:rgba(5,5,8,.7);backdrop-filter:blur(8px);padding:4px 10px;border-radius:100px;border:1px solid rgba(255,255,255,.1)}
+.proj-badge-num{left:16px;color:rgba(255,255,255,.5)}
+.proj-badge-type{right:16px}
+.proj-body{padding:22px 26px 26px;display:flex;flex-direction:column;gap:10px;flex:1}
+.proj-title{font-size:1.15rem;font-weight:700;color:#fff;line-height:1.2}
+.proj-desc{color:rgba(255,255,255,.42);font-size:.85rem;line-height:1.7;font-weight:300;flex:1}
+.proj-tags{display:flex;flex-wrap:wrap;gap:7px}
+.proj-tag{padding:3px 10px;border-radius:100px;font-size:.68rem;letter-spacing:.07em}
+.proj-footer{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.proj-link{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:100px;border:1px solid rgba(167,139,250,.3);color:rgba(167,139,250,.85);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;background:rgba(167,139,250,.06);text-decoration:none;transition:all .25s ease}
+.proj-link:hover{background:rgba(167,139,250,.18);border-color:rgba(167,139,250,.65)}
+.proj-arrow{color:rgba(255,255,255,.2);font-size:1.1rem;transition:transform .2s ease}
+.proj-card:hover .proj-arrow{transform:translateX(4px);color:rgba(167,139,250,.6)}
+
+/* ── EXPERIENCE ── */
+.exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.exp-card{padding:34px;border-radius:22px}
+.exp-period{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;display:block}
+.exp-role{font-size:1.25rem;font-weight:700;color:#fff;margin-bottom:4px}
+.exp-org{color:rgba(255,255,255,.38);font-size:.83rem;margin-bottom:14px}
+.exp-detail{color:rgba(255,255,255,.5);font-size:.88rem;line-height:1.7;font-weight:300}
+
+/* ── CONTACT ── */
+#contact{text-align:center;position:relative}
+.contact-glow{position:absolute;top:20%;left:50%;transform:translateX(-50%);width:600px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,.07) 0%,transparent 70%);filter:blur(60px);pointer-events:none}
+.contact-inner{max-width:680px;margin:0 auto;position:relative}
+.contact-title{font-size:clamp(2.5rem,7vw,5.5rem);font-weight:800;line-height:1;margin:14px 0 20px}
+.contact-sub{color:rgba(255,255,255,.38);font-size:.98rem;line-height:1.7;font-weight:300;margin-bottom:44px}
+.contact-buttons{display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
+.contact-meta{margin-top:28px;color:rgba(255,255,255,.3);font-size:.82rem}
+
+/* ── FOOTER ── */
+footer{padding:28px 40px;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;color:rgba(255,255,255,.22);font-size:.76rem}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  nav{padding:14px 20px}
+  .nav-links{gap:1rem}
+  .nav-links a{display:none}
+  section{padding:70px 20px}
+  #about-section{padding:70px 20px}
+  .about-grid,.skills-grid,.exp-grid{grid-template-columns:1fr;gap:32px}
+  .projects-grid{grid-template-columns:1fr 1fr}
+  h1.hero-name{font-size:clamp(4rem,20vw,9rem)}
+  #hero{padding:0 20px}
+  footer{flex-direction:column;gap:8px;text-align:center}
+}
+@media(max-width:540px){
+  .projects-grid{grid-template-columns:1fr}
+  .hero-buttons{gap:10px}
+  .btn-primary,.btn-ghost{padding:12px 24px;font-size:.78rem}
+}
+</style>
+</head>
+<body>
+
+<!-- Scroll progress -->
+<div id="progress-bar"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-logo"><span class="gt">N</span>AKUL</div>
+  <div class="nav-links">
+    <a href="#hero">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+    <a href="#" class="resume-btn" id="resume-dl" onclick="downloadResume();return false;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Resume
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <!-- Orbit rings -->
+  <div class="orbit" style="width:280px;height:280px;top:50%;left:50%;margin:-140px 0 0 -140px;animation-duration:14s"></div>
+  <div class="orbit" style="width:420px;height:420px;top:50%;left:50%;margin:-210px 0 0 -210px;animation-duration:20s;animation-direction:reverse"></div>
+  <div class="orbit" style="width:560px;height:560px;top:50%;left:50%;margin:-280px 0 0 -280px;animation-duration:28s"></div>
+
+  <!-- Glow blobs -->
+  <div class="glow-blob" style="width:380px;height:380px;top:15%;left:15%;background:radial-gradient(circle,rgba(167,139,250,.11) 0%,transparent 70%)"></div>
+  <div class="glow-blob" style="width:320px;height:320px;bottom:15%;right:15%;background:radial-gradient(circle,rgba(52,211,153,.09) 0%,transparent 70%)"></div>
+
+  <!-- Floating SVG shapes -->
+  <div class="shape" style="top:16%;left:8%;animation-duration:6s">
+    <svg width="72" height="72" viewBox="0 0 100 100" opacity=".65"><polygon points="50,5 90,27 90,73 50,95 10,73 10,27" fill="none" stroke="#a78bfa" stroke-width="2" opacity=".7"/><polygon points="50,5 90,27 50,49 10,27" fill="#a78bfa" opacity=".13"/><polygon points="90,27 50,49 50,95 90,73" fill="#a78bfa" opacity=".2"/></svg>
+  </div>
+  <div class="shape" style="top:18%;right:9%;animation-duration:8s;animation-delay:1s">
+    <svg width="84" height="84" viewBox="0 0 100 100" opacity=".58"><defs><radialGradient id="sg1" cx="35%" cy="35%"><stop offset="0%" stop-color="#fff" stop-opacity=".4"/><stop offset="60%" stop-color="#60a5fa" stop-opacity=".8"/><stop offset="100%" stop-color="#60a5fa" stop-opacity=".2"/></radialGradient></defs><circle cx="50" cy="50" r="42" fill="url(#sg1)"/><ellipse cx="50" cy="50" rx="42" ry="15" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="1"/></svg>
+  </div>
+  <div class="shape" style="bottom:22%;left:11%;animation-duration:7s;animation-delay:2s">
+    <svg width="66" height="66" viewBox="0 0 100 100" opacity=".5"><ellipse cx="50" cy="50" rx="40" ry="14" fill="none" stroke="#34d399" stroke-width="8" opacity=".6"/><ellipse cx="50" cy="50" rx="40" ry="14" fill="none" stroke="#34d399" stroke-width="3" opacity=".3" transform="rotate(22 50 50)"/></svg>
+  </div>
+  <div class="shape" style="bottom:24%;right:8%;animation-duration:9s;animation-delay:.5s">
+    <svg width="58" height="58" viewBox="0 0 100 100" opacity=".6"><polygon points="50,5 90,27 90,73 50,95 10,73 10,27" fill="none" stroke="#f59e0b" stroke-width="2" opacity=".7"/><polygon points="50,5 90,27 50,49 10,27" fill="#f59e0b" opacity=".15"/></svg>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-badge">
+      <div class="hero-dot"></div>
+      AVAILABLE FOR INTERNSHIP · 2025–2026
+    </div>
+
+    <h1 class="hero-name">
+      <span class="gt" id="hN">N</span><span class="gt" id="hA">A</span><span class="gt" id="hK">K</span><span class="gt" id="hU">U</span><span class="gt" id="hL">L</span>
+    </h1>
+
+    <p class="hero-sub">CS Undergrad @ NSIT · <span style="color:#a78bfa">ML / AI · Web Dev · Game Design</span></p>
+
+    <div class="hero-buttons">
+      <a href="#contact" class="btn-primary">Get in Touch</a>
+      <a href="#projects" class="btn-ghost">View Work</a>
+      <a href="#" class="resume-btn" onclick="downloadResume();return false;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Resume
+      </a>
+    </div>
+
+    <div class="scroll-hint">
+      <span>SCROLL</span>
+      <div class="scroll-line"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about-section">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-text">
+        <span class="label fade-in">// about me</span>
+        <h2 class="fade-in" style="transition-delay:.1s">Turning Ideas Into<br><span class="gt">Digital Reality</span></h2>
+        <p class="fade-in" style="transition-delay:.2s">I'm a Computer Science undergraduate at Netaji Subhas Institute of Technology, specialising in Mathematics &amp; Computing. I build at the intersection of AI, web development, and creative technology.</p>
+        <p class="fade-in" style="transition-delay:.3s">Beyond code, I've spent 2+ years mentoring classmates in maths and programming — rated 8/10 by students — bringing the same analytical clarity to everything I create.</p>
+        <div class="fade-in" style="transition-delay:.4s;margin-top:28px">
+          <a href="#" class="resume-btn" onclick="downloadResume();return false;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Resume
+          </a>
+        </div>
+      </div>
+      <div class="stats-grid fade-in-right" style="transition-delay:.2s">
+        <div class="stat-card"><div class="stat-num gt">2+</div><div class="stat-lbl">Years Tutoring</div></div>
+        <div class="stat-card"><div class="stat-num gt">B.Tech</div><div class="stat-lbl">CSE @ NSIT</div></div>
+        <div class="stat-card"><div class="stat-num gt">2025</div><div class="stat-lbl">Internship Ready</div></div>
+        <div class="stat-card"><div class="stat-num gt">10+</div><div class="stat-lbl">Skills &amp; Tools</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="container">
+    <span class="section-label fade-in">// what i know</span>
+    <h2 class="section-title fade-in" style="transition-delay:.1s">Skills &amp; <span class="gt">Tools</span></h2>
+    <div class="skills-grid">
+      <div class="skill-box fade-in" style="border:1px solid rgba(167,139,250,.18);background:rgba(167,139,250,.06);transition-delay:.05s">
+        <span class="skill-box-label" style="color:#a78bfa">Programming</span>
+        <div class="pills">
+          <span class="pill">Python</span><span class="pill">C++</span><span class="pill">Java</span><span class="pill">HTML/CSS</span><span class="pill">SQL</span><span class="pill">React JS</span>
+        </div>
+      </div>
+      <div class="skill-box fade-in" style="border:1px solid rgba(96,165,250,.18);background:rgba(96,165,250,.06);transition-delay:.1s">
+        <span class="skill-box-label" style="color:#60a5fa">AI &amp; Data</span>
+        <div class="pills">
+          <span class="pill">Machine Learning</span><span class="pill">AI Tools</span><span class="pill">Data Structures</span><span class="pill">Algorithms</span><span class="pill">DBMS</span>
+        </div>
+      </div>
+      <div class="skill-box fade-in" style="border:1px solid rgba(52,211,153,.18);background:rgba(52,211,153,.06);transition-delay:.15s">
+        <span class="skill-box-label" style="color:#34d399">Creative</span>
+        <div class="pills">
+          <span class="pill">Game Design</span><span class="pill">Animation</span><span class="pill">Game Physics</span><span class="pill">Graphic Design</span><span class="pill">Canva</span><span class="pill">Video Editing</span>
+        </div>
+      </div>
+      <div class="skill-box fade-in" style="border:1px solid rgba(245,158,11,.18);background:rgba(245,158,11,.06);transition-delay:.2s">
+        <span class="skill-box-label" style="color:#f59e0b">Professional</span>
+        <div class="pills">
+          <span class="pill">Team Leadership</span><span class="pill">Mentoring</span><span class="pill">Business Dev</span><span class="pill">CRM Tools</span><span class="pill">Excel</span><span class="pill">Communication</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="container-wide">
+    <span class="section-label fade-in">// selected work</span>
+    <h2 class="section-title fade-in" style="transition-delay:.1s">Featured <span class="gt">Projects</span></h2>
+    <div class="projects-grid">
+
+      <!-- Card 1 -->
+      <div class="proj-card fade-in" style="transition-delay:.05s">
+        <div class="proj-img-wrap">
+          <img class="proj-img" src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=700&q=80&auto=format&fit=crop" alt="AI visualization" loading="lazy" onerror="this.parentElement.style.background='linear-gradient(135deg,rgba(167,139,250,.2),#0d0d14)';this.style.display='none';this.nextElementSibling.nextElementSibling.style.display='flex'"/>
+          <div class="proj-img-overlay"></div>
+          <div style="display:none;width:100%;height:210px;align-items:center;justify-content:center;font-size:3.5rem">🤖</div>
+          <span class="proj-badge proj-badge-num">01</span>
+          <span class="proj-badge proj-badge-type" style="color:#a78bfa;border-color:rgba(167,139,250,.4)">ML · Python</span>
+        </div>
+        <div class="proj-body">
+          <div class="proj-title">AI Study Assistant</div>
+          <div class="proj-desc">Intelligent study tool using ML to personalise learning paths, auto-generate quizzes, and track student performance.</div>
+          <div class="proj-tags">
+            <span class="proj-tag" style="background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.25)">Python</span>
+            <span class="proj-tag" style="background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.25)">ML</span>
+            <span class="proj-tag" style="background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.25)">AI</span>
+          </div>
+          <div class="proj-footer">
+            <a href="#" class="proj-link">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              View Project
+            </a>
+            <span class="proj-arrow">→</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="proj-card fade-in" style="transition-delay:.1s">
+        <div class="proj-img-wrap">
+          <img class="proj-img" src="https://images.unsplash.com/photo-1551103782-8ab07afd45c1?w=700&q=80&auto=format&fit=crop" alt="Game development" loading="lazy" onerror="this.parentElement.style.background='linear-gradient(135deg,rgba(96,165,250,.2),#0d0d14)';this.style.display='none';this.nextElementSibling.nextElementSibling.style.display='flex'"/>
+          <div class="proj-img-overlay"></div>
+          <div style="display:none;width:100%;height:210px;align-items:center;justify-content:center;font-size:3.5rem">🎮</div>
+          <span class="proj-badge proj-badge-num">02</span>
+          <span class="proj-badge proj-badge-type" style="color:#60a5fa;border-color:rgba(96,165,250,.4)">C++ · Game Dev</span>
+        </div>
+        <div class="proj-body">
+          <div class="proj-title">Game Physics Engine</div>
+          <div class="proj-desc">Custom 2D physics engine in C++ with collision detection, rigid body dynamics, and a fully playable demo game.</div>
+          <div class="proj-tags">
+            <span class="proj-tag" style="background:rgba(96,165,250,.1);color:#60a5fa;border:1px solid rgba(96,165,250,.25)">C++</span>
+            <span class="proj-tag" style="background:rgba(96,165,250,.1);color:#60a5fa;border:1px solid rgba(96,165,250,.25)">Physics</span>
+            <span class="proj-tag" style="background:rgba(96,165,250,.1);color:#60a5fa;border:1px solid rgba(96,165,250,.25)">Animation</span>
+          </div>
+          <div class="proj-footer">
+            <a href="#" class="proj-link" style="color:rgba(96,165,250,.85);border-color:rgba(96,165,250,.3);background:rgba(96,165,250,.06)">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              View Project
+            </a>
+            <span class="proj-arrow">→</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="proj-card fade-in" style="transition-delay:.15s">
+        <div class="proj-img-wrap">
+          <img class="proj-img" src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=700&q=80&auto=format&fit=crop" alt="Web development" loading="lazy" onerror="this.parentElement.style.background='linear-gradient(135deg,rgba(52,211,153,.2),#0d0d14)';this.style.display='none';this.nextElementSibling.nextElementSibling.style.display='flex'"/>
+          <div class="proj-img-overlay"></div>
+          <div style="display:none;width:100%;height:210px;align-items:center;justify-content:center;font-size:3.5rem">🌐</div>
+          <span class="proj-badge proj-badge-num">03</span>
+          <span class="proj-badge proj-badge-type" style="color:#34d399;border-color:rgba(52,211,153,.4)">React · Web</span>
+        </div>
+        <div class="proj-body">
+          <div class="proj-title">Portfolio & Blog Platform</div>
+          <div class="proj-desc">Full-stack web app with dynamic routing, markdown blog posts, and custom CMS — focused on performance and clean UX.</div>
+          <div class="proj-tags">
+            <span class="proj-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.25)">React JS</span>
+            <span class="proj-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.25)">HTML/CSS</span>
+            <span class="proj-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.25)">Node.js</span>
+          </div>
+          <div class="proj-footer">
+            <a href="#" class="proj-link" style="color:rgba(52,211,153,.85);border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.06)">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              View Project
+            </a>
+            <span class="proj-arrow">→</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="proj-card fade-in" style="transition-delay:.2s">
+        <div class="proj-img-wrap">
+          <img class="proj-img" src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=700&q=80&auto=format&fit=crop" alt="Data dashboard" loading="lazy" onerror="this.parentElement.style.background='linear-gradient(135deg,rgba(245,158,11,.2),#0d0d14)';this.style.display='none';this.nextElementSibling.nextElementSibling.style.display='flex'"/>
+          <div class="proj-img-overlay"></div>
+          <div style="display:none;width:100%;height:210px;align-items:center;justify-content:center;font-size:3.5rem">📊</div>
+          <span class="proj-badge proj-badge-num">04</span>
+          <span class="proj-badge proj-badge-type" style="color:#f59e0b;border-color:rgba(245,158,11,.4)">Data · Python</span>
+        </div>
+        <div class="proj-body">
+          <div class="proj-title">Data Viz Dashboard</div>
+          <div class="proj-desc">Interactive dashboard exploring ML model performance metrics with Python and Plotly. Clean charts, real insights.</div>
+          <div class="proj-tags">
+            <span class="proj-tag" style="background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.25)">Python</span>
+            <span class="proj-tag" style="background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.25)">SQL</span>
+            <span class="proj-tag" style="background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.25)">Plotly</span>
+          </div>
+          <div class="proj-footer">
+            <a href="#" class="proj-link" style="color:rgba(245,158,11,.85);border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.06)">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              View Project
+            </a>
+            <span class="proj-arrow">→</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="proj-card fade-in" style="transition-delay:.25s">
+        <div class="proj-img-wrap">
+          <img class="proj-img" src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=700&q=80&auto=format&fit=crop" alt="Graphic design" loading="lazy" onerror="this.parentElement.style.background='linear-gradient(135deg,rgba(236,72,153,.2),#0d0d14)';this.style.display='none';this.nextElementSibling.nextElementSibling.style.display='flex'"/>
+          <div class="proj-img-overlay"></div>
+          <div style="display:none;width:100%;height:210px;align-items:center;justify-content:center;font-size:3.5rem">🎨</div>
+          <span class="proj-badge proj-badge-num">05</span>
+          <span class="proj-badge proj-badge-type" style="color:#ec4899;border-color:rgba(236,72,153,.4)">Design · Canva</span>
+        </div>
+        <div class="proj-body">
+          <div class="proj-title">Graphic Design Portfolio</div>
+          <div class="proj-desc">Curated collection of branding, posters, and social media designs — balancing aesthetics with clear communication.</div>
+          <div class="proj-tags">
+            <span class="proj-tag" style="background:rgba(236,72,153,.1);color:#ec4899;border:1px solid rgba(236,72,153,.25)">Graphic Design</span>
+            <span class="proj-tag" style="background:rgba(236,72,153,.1);color:#ec4899;border:1px solid rgba(236,72,153,.25)">Canva</span>
+            <span class="proj-tag" style="background:rgba(236,72,153,.1);color:#ec4899;border:1px solid rgba(236,72,153,.25)">Branding</span>
+          </div>
+          <div class="proj-footer">
+            <a href="#" class="proj-link" style="color:rgba(236,72,153,.85);border-color:rgba(236,72,153,.3);background:rgba(236,72,153,.06)">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              View Project
+            </a>
+            <span class="proj-arrow">→</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="proj-card fade-in" style="transition-delay:.3s">
+        <div class="proj-img-wrap">
+          <img class="proj-img" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=700&q=80&auto=format&fit=crop" alt="Students studying" loading="lazy" onerror="this.parentElement.style.background='linear-gradient(135deg,rgba(20,184,166,.2),#0d0d14)';this.style.display='none';this.nextElementSibling.nextElementSibling.style.display='flex'"/>
+          <div class="proj-img-overlay"></div>
+          <div style="display:none;width:100%;height:210px;align-items:center;justify-content:center;font-size:3.5rem">📚</div>
+          <span class="proj-badge proj-badge-num">06</span>
+          <span class="proj-badge proj-badge-type" style="color:#14b8a6;border-color:rgba(20,184,166,.4)">Education · React</span>
+        </div>
+        <div class="proj-body">
+          <div class="proj-title">Peer Tutor App</div>
+          <div class="proj-desc">Web app connecting students with peer tutors — session booking, live chat, and progress tracking.</div>
+          <div class="proj-tags">
+            <span class="proj-tag" style="background:rgba(20,184,166,.1);color:#14b8a6;border:1px solid rgba(20,184,166,.25)">React JS</span>
+            <span class="proj-tag" style="background:rgba(20,184,166,.1);color:#14b8a6;border:1px solid rgba(20,184,166,.25)">Firebase</span>
+            <span class="proj-tag" style="background:rgba(20,184,166,.1);color:#14b8a6;border:1px solid rgba(20,184,166,.25)">UX</span>
+          </div>
+          <div class="proj-footer">
+            <a href="#" class="proj-link" style="color:rgba(20,184,166,.85);border-color:rgba(20,184,166,.3);background:rgba(20,184,166,.06)">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              View Project
+            </a>
+            <span class="proj-arrow">→</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section>
+  <div class="container">
+    <span class="section-label fade-in">// experience</span>
+    <h2 class="section-title fade-in" style="transition-delay:.1s">What I've <span class="gt-warm">Done</span></h2>
+    <div class="exp-grid">
+      <div class="exp-card fade-in" style="border:1px solid rgba(245,158,11,.2);background:rgba(245,158,11,.05);transition-delay:.05s">
+        <span class="exp-period" style="color:#f59e0b">2022 – Present</span>
+        <div class="exp-role">Peer Tutor &amp; Mentor</div>
+        <div class="exp-org">Home Tuition &amp; School Sessions, New Delhi</div>
+        <div class="exp-detail">Mentored classmates and juniors in mathematics and programming. Rated 8/10 by students for clarity and lasting impact.</div>
+      </div>
+      <div class="exp-card fade-in" style="border:1px solid rgba(167,139,250,.2);background:rgba(167,139,250,.05);transition-delay:.1s">
+        <span class="exp-period" style="color:#a78bfa">2024 – 2028</span>
+        <div class="exp-role">B.Tech — CSE</div>
+        <div class="exp-org">Netaji Subhas Institute of Technology</div>
+        <div class="exp-detail">Specialisation in Mathematics &amp; Computing. Building strong foundations in algorithms, AI, and software engineering.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-glow"></div>
+  <div class="contact-inner">
+    <span class="section-label fade-in">// get in touch</span>
+    <h2 class="contact-title fade-in" style="transition-delay:.1s">Let's Build<br><span class="gt">Together</span></h2>
+    <p class="contact-sub fade-in" style="transition-delay:.2s">Actively looking for internship opportunities for 2025–2026. ML, web dev, or anything creative — let's talk.</p>
+    <div class="contact-buttons fade-in" style="transition-delay:.3s">
+      <a href="mailto:nakul.1010101@gmail.com" class="btn-primary">Email Me</a>
+      <a href="#" class="resume-btn" style="padding:14px 36px;font-size:.85rem" onclick="downloadResume();return false;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download Resume
+      </a>
+    </div>
+    <div class="contact-meta fade-in" style="transition-delay:.4s">nakul.1010101@gmail.com &nbsp;·&nbsp; New Delhi, India &nbsp;·&nbsp; +91 8700035253</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2025 Nakul. Built with ♥</span>
+  <span>New Delhi · NSIT</span>
+</footer>
+
+<script>
+// ── Scroll progress bar
+window.addEventListener('scroll',()=>{
+  const el=document.getElementById('progress-bar');
+  const pct=(window.scrollY/(document.body.scrollHeight-window.innerHeight))*100;
+  el.style.width=Math.min(pct,100)+'%';
+},{passive:true});
+
+// ── Sticky nav
+window.addEventListener('scroll',()=>{
+  document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>50);
+},{passive:true});
+
+// ── Scroll fade-in
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}});
+},{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.fade-in,.fade-in-left,.fade-in-right').forEach(el=>io.observe(el));
+
+// ── Stagger child delays on proj-grid
+document.querySelectorAll('.projects-grid .proj-card').forEach((c,i)=>{
+  if(!c.style.transitionDelay) c.style.transitionDelay=(i*.08)+'s';
+});
+
+// ── Resume download
+function downloadResume(){
+  const txt=`NAKUL
+Computer Science Undergraduate · Seeking Internship 2025–2026
+New Delhi, India | +91 8700035253 | nakul.1010101@gmail.com
+
+PROFILE
+Dedicated CS undergraduate at NSIT with a strong foundation in mathematics, programming, and teaching. Skills span Python, C++, React JS, game design, ML, and graphic tools. Actively seeking internship for 2025-2026.
+
+EXPERIENCE
+Peer Tutor & Mentor | 2022 – Present
+Home Tuition & School Sessions, New Delhi
+• Conducted peer tutoring in mathematics and computing
+• Assisted classmates in programming concepts and debugging  
+• Rated 8/10 by students
+
+EDUCATION
+B.Tech — Computer Science & Engineering | Aug 2024 – Aug 2028
+Netaji Subhas Institute of Technology · Specialisation: Mathematics & Computing
+
+12th Grade — CBSE | Mar 2022 – Mar 2024, Kendriya Vidyalaya
+
+SKILLS
+Programming : Python · C++ · HTML · Java · SQL · React JS
+AI & Data    : Machine Learning · AI Tools · Data Structures · DBMS
+Creative     : Game Design · Animation · Graphic Design · Canva · Video Editing
+Professional : Team Leadership · Mentoring · Business Development · Excel
+
+ACHIEVEMENTS
+• SFA Football Certificate – represented team in SFA tournament
+• Peer Tutoring Recognition – formally recognised for teaching contributions
+
+LANGUAGES: English (Proficient) · Hindi (Native)
+AVAILABLE: Internships 2025–2026 · New Delhi, India`;
+  const blob=new Blob([txt],{type:'text/plain'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='Nakul_Resume.txt';
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+window.downloadResume=downloadResume;
+</script>
+</body>
+</html>
